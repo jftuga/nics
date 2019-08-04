@@ -1,0 +1,49 @@
+project_name: nics
+build:
+  main: .
+  binary: nics
+  env:
+    - CGO_ENABLED=0
+  goos:
+    - darwin
+    - linux
+    - windows
+    - freebsd
+  goarch:
+    - amd64
+    - arm
+    - mips
+  goarm:
+      - 6
+      - 7
+  ignore:
+    - goos: freebsd
+      goarch: arm
+    - goos: freebsd
+      goarch: mips
+archive:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ .Arm }}"
+  format: tar.gz
+  format_overrides:
+    - goos: windows
+      format: zip
+  replacements:
+      darwin: macOS
+  wrap_in_directory: true
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}--sha256_checksums.txt"
+release:
+  draft: true
+nfpm:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ .Arm }}"
+  homepage:  https://github.com/jftuga/nics
+  description: nics, Display information about Network Inferface Cards (NICs)
+  maintainer: https://reddit.com/u/jftuga
+  license: MIT
+  vendor: jftuga
+  formats:
+  - deb
+  - rpm
+  recommends:
+  - rpm
+
