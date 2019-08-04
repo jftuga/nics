@@ -1,7 +1,7 @@
 # nics
 Display information about Network Inferface Cards (NICs)
 
-Binaries for Windows, MacOS, Linux and FreeBSD can be found on the [Releases Page](https://github.com/jftuga/nics/releases).
+Binaries for Windows, MacOS, Linux and FreeBSD can be found on the [Releases Page](https://github.com/jftuga/nics/releases) -- expand the `Assets` to see the downloads.
 
 ## Usage
 
