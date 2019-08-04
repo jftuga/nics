@@ -28,7 +28,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-const version = "1.0.0"
+const version = "1.1.0"
 
 func isBriefEntry(ifaceName, macAddr, mtu, flags string, ipv4List, ipv6List []string, debug bool) bool {
 	if debug {
@@ -124,7 +124,9 @@ func networkInterfaces(brief bool, debug bool) {
 		}
 
 		if !brief {
-			table.Append([]string{ifaceName, strings.Join(allIPv4, " "), strings.Join(allIPv6, " "), macAddr, mtu, flags})
+			table.Append([]string{ifaceName, strings.Join(allIPv4, "\n"), strings.Join(allIPv6, "\n"), macAddr, mtu, strings.Replace(flags, "|", "\n", -1)})
+			table.SetAutoWrapText(true)
+			table.SetRowLine(true)
 		}
 	}
 	table.Render()
