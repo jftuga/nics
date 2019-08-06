@@ -26,12 +26,13 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 	"unsafe"
 
 	"github.com/olekukonko/tablewriter"
 )
 
-const version = "1.2.0"
+const version = "1.3.0"
 
 const (
 	MAX_HOSTNAME_LEN    = 128
@@ -81,7 +82,7 @@ type ipAdapterInfo struct {
 	ipAddressList      ipAddressString
 	gatewayList        ipAddressString
 	dhcpServer         ipAddressString
-	haveWins           byte
+	haveWins           bool
 	primaryWins        ipAddressString
 	secondaryWins      ipAddressString
 	leaseObtained      uint64
@@ -96,6 +97,14 @@ var (
 func sliceToString(slice []byte) string {
 	n := bytes.IndexByte(slice, 0)
 	return string(slice[:n])
+}
+
+func timeToString(input uint64) string {
+	t := time.Unix(int64(input), 0)
+	t = t.In(time.Local)
+	raw := fmt.Sprintf("%s", t)
+	slots := strings.Split(raw, " ")
+	return fmt.Sprintf("%s %s", slots[0], slots[1])
 }
 
 func getDNSEntries() ([]string, error) {
@@ -123,7 +132,7 @@ func getDNSEntries() ([]string, error) {
 	return []string{dns1, dns2}, nil
 }
 
-func getGateways() (map[string]string, error) {
+func getGatewaysAndDHCP(brief bool) (map[string]string, error) {
 	err := getAdaptersInfo.Find()
 	if err != nil {
 		return nil, err
@@ -137,6 +146,7 @@ func getGateways() (map[string]string, error) {
 		return nil, err
 	}
 
+	ipMapDHCP := make(map[string][]string) // key:adapter IP; values:0 = dhcp server ip, 1 = leaseObtained, 2 = leaseExpires
 	ipMapGateway := make(map[string]string)
 
 	adapter := &adapters[0]
@@ -144,18 +154,42 @@ func getGateways() (map[string]string, error) {
 		/*
 			fmt.Println("  ip:", sliceToString(adapter.ipAddressList.address[:]))
 			fmt.Println("gate:", sliceToString(adapter.gatewayList.address[:]))
+			fmt.Println("  primaryWins:", sliceToString(adapter.primaryWins.address[:]))
+			fmt.Println("secondaryWins:", sliceToString(adapter.secondaryWins.address[:]))
 			fmt.Println()
 		*/
 		ip := sliceToString(adapter.ipAddressList.address[:])
 		gate := sliceToString(adapter.gatewayList.address[:])
+		dhcpServer := sliceToString(adapter.dhcpServer.address[:])
+		leaseObtained := adapter.leaseObtained
+		leaseExpires := adapter.leaseExpires
+
 		if ip != "0.0.0.0" {
 			ipMapGateway[ip] = gate
+		}
+		if len(dhcpServer) >= 4 {
+			ipMapDHCP[ip] = []string{dhcpServer, timeToString(leaseObtained), timeToString(leaseExpires)}
 		}
 
 		adapter = adapter.next
 	}
 
+	if !brief && len(ipMapDHCP) > 0 {
+		renderDHCPTable(ipMapDHCP)
+		fmt.Println()
+	}
+
 	return ipMapGateway, nil
+}
+
+func renderDHCPTable(ipMapDHCP map[string][]string) {
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetAutoWrapText(false)
+	table.SetHeader([]string{"IP", "DHCP Server", "Lease Obtained", "Lease Expires"})
+	for ip, dhcpInfo := range ipMapDHCP {
+		table.Append([]string{ip, dhcpInfo[0], dhcpInfo[1], dhcpInfo[2]})
+	}
+	table.Render()
 }
 
 func isBriefEntry(ifaceName, macAddr, mtu, flags string, ipv4List, ipv6List []string, debug bool) bool {
@@ -286,7 +320,7 @@ func arrayContains(value string, array []string) bool {
 	return false
 }
 
-func gatewayAndDNS(allIPv4, allIPv6 []string) {
+func gatewayAndDNS(allIPv4, allIPv6 []string, brief bool) {
 	var err error
 	var dns = []string{"N/A", "N/A"}
 	dns, err = getDNSEntries()
@@ -295,7 +329,7 @@ func gatewayAndDNS(allIPv4, allIPv6 []string) {
 	}
 
 	ipMapGateway := make(map[string]string)
-	ipMapGateway, err = getGateways()
+	ipMapGateway, err = getGatewaysAndDHCP(brief)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -338,5 +372,5 @@ func main() {
 
 	allIPv4, allIPv6 := networkInterfaces(!(*argsAllDetails), *argsDebug)
 	fmt.Println()
-	gatewayAndDNS(allIPv4, allIPv6)
+	gatewayAndDNS(allIPv4, allIPv6, !(*argsAllDetails))
 }
