@@ -32,7 +32,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-const version = "1.3.0"
+const version = "1.3.1"
 
 const (
 	MAX_HOSTNAME_LEN    = 128
@@ -351,7 +351,7 @@ func gatewayAndDNS(allIPv4, allIPv6 []string, brief bool) {
 }
 
 func main() {
-	argsAllDetails := flag.Bool("a", false, "show all details on ALL interfaces")
+	argsAllDetails := flag.Bool("a", false, "show all details on ALL interfaces, including DHCP")
 	argsDebug := flag.Bool("d", false, "show debug information")
 	argsVersion := flag.Bool("v", false, "show program version")
 	flag.Usage = func() {
