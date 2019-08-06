@@ -32,7 +32,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-const version = "1.3.1"
+const version = "1.3.2"
 
 const (
 	MAX_HOSTNAME_LEN    = 128
@@ -185,7 +185,7 @@ func getGatewaysAndDHCP(brief bool) (map[string]string, error) {
 func renderDHCPTable(ipMapDHCP map[string][]string) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetAutoWrapText(false)
-	table.SetHeader([]string{"IP", "DHCP Server", "Lease Obtained", "Lease Expires"})
+	table.SetHeader([]string{"IP", "DHCP Server", "Lease Renewed", "Lease Expires"})
 	for ip, dhcpInfo := range ipMapDHCP {
 		table.Append([]string{ip, dhcpInfo[0], dhcpInfo[1], dhcpInfo[2]})
 	}
