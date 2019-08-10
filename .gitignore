@@ -9,6 +9,9 @@
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
+go.mod
+go.sum
+
 *.out
 *.bat
 *.ppk
