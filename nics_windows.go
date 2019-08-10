@@ -186,7 +186,7 @@ func gatewayAndDNS(allIPv4, allIPv6 []string, brief bool) {
 
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetAutoWrapText(false)
-	table.SetHeader([]string{"Gateway", "DNS1", "DNS2"})
+	table.SetHeader([]string{"Gateway", "DNS 1", "DNS 2"})
 	for ip := range ipMapGateway {
 		if arrayContains(ip, allIPv4) {
 			table.Append([]string{ipMapGateway[ip], dns[0], dns[1]})

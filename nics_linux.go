@@ -180,7 +180,7 @@ func gatewayAndDNS(allIPv4, allIPv6 []string, brief bool) {
 
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetAutoWrapText(false)
-	table.SetHeader([]string{"Gateway", "DNS1", "DNS2"})
+	table.SetHeader([]string{"Gateway", "DNS 1", "DNS 2"})
 	table.Append([]string{gateway, dns[0], dns[1]})
 
 	table.Render()
