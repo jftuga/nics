@@ -17,6 +17,8 @@ usage: nics [options]
 
 ```
 go get github.com/jftuga/nics
+go build
+./nics (or .\nics.exe)
 ```
 
 ## Examples
