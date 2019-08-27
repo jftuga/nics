@@ -42,3 +42,11 @@ func arrayContains(value string, array []string) bool {
 	}
 	return false
 }
+
+func splitIPMask(ipWithMask string) (string, string) {
+	if strings.Contains(ipWithMask, "/") {
+		slots := strings.Split(ipWithMask, "/")
+		return slots[0], slots[1]
+	}
+	return ipWithMask, ""
+}
