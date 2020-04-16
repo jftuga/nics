@@ -23,7 +23,7 @@ build:
       goarch: mips
 archive:
   name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ .Arm }}"
-  format: tar.gz
+  format: tar.xz
   format_overrides:
     - goos: windows
       format: zip
@@ -37,7 +37,7 @@ release:
 nfpm:
   name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ .Arm }}"
   homepage:  https://github.com/jftuga/nics
-  description: nics, Display information about Network Inferface Cards (NICs)
+  description: nics, Display information about Network Interface Cards (NICs)
   maintainer: https://reddit.com/u/jftuga
   license: MIT
   vendor: jftuga
