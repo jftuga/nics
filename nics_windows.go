@@ -142,7 +142,7 @@ func getGatewaysAndDHCP(brief bool) (map[string]string, error) {
 		leaseObtained := adapter.leaseObtained
 		leaseExpires := adapter.leaseExpires
 
-		if ip != "0.0.0.0" {
+		if ip != "0.0.0.0" && gate != "0.0.0.0" {
 			ipMapGateway[ip] = gate
 		}
 		if len(dhcpServer) >= 4 {
