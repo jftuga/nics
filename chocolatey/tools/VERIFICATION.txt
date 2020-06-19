@@ -1,0 +1,4 @@
+﻿
+VERIFICATION
+
+This package maintainer, John Taylor, is also the author of this program.

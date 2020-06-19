@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>nics</id>
+    <version>1.4.2.20200416</version>
+    <title>nics</title>
+    <authors>John Taylor</authors>
+    <owners>John Taylor</owners>
+    <licenseUrl>https://github.com/jftuga/nics/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/jftuga/nics</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description><![CDATA[
+nics: Display information about Network Inferface Cards (NICs)
+
+Example Output:
++----------+----------------+-------------------+------+------------------------+
+|   NAME   |      IPV4      |    MAC ADDRESS    | MTU  |         FLAGS          |
++----------+----------------+-------------------+------+------------------------+
+| Ethernet | 172.16.7.89/24 | 98:ff:aa:cb:24:a0 | 1500 | up|broadcast|multicast |
++----------+----------------+-------------------+------+------------------------+
+
++------------+------------+------------+
+|  GATEWAY   |    DNS1    |    DNS2    |
++------------+------------+------------+
+| 172.22.7.1 | 172.16.7.2 | 172.16.7.3 |
++------------+------------+------------+
+]]></description>
+    <summary>Display information about Network Inferface Cards (NICs)</summary>
+    <tags></tags>
+    <releaseNotes>https://github.com/jftuga/nics/releases/tag/v1.4.2</releaseNotes>
+    <docsUrl>https://github.com/jftuga/nics/blob/master/README.md</docsUrl>
+    <projectSourceUrl>https://github.com/jftuga/nics</projectSourceUrl>
+    <packageSourceUrl>https://github.com/jftuga/nics/tree/master/chocolatey</packageSourceUrl>
+    <dependencies>
+      <dependency id="chocolatey" version="0.10.15" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
