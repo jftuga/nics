@@ -4,7 +4,7 @@
   <metadata>
     <id>nics</id>
     <version>1.4.2.20200416</version>
-    <title>nics</title>
+    <title>nics - network interface cards</title>
     <authors>John Taylor</authors>
     <owners>John Taylor</owners>
     <licenseUrl>https://github.com/jftuga/nics/blob/master/LICENSE</licenseUrl>
