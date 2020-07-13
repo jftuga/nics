@@ -3,7 +3,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>nics</id>
-    <version>1.4.2.20200416/version>
+    <version>1.4.2.20200416</version>
     <title>nics - network interface cards</title>
     <authors>John Taylor</authors>
     <owners>John Taylor</owners>
