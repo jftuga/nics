@@ -166,6 +166,7 @@ func main() {
 
 	if *argsVersion {
 		fmt.Fprintf(os.Stderr, "version %s\n", version)
+		fmt.Fprintf(os.Stderr, "https://github.com/jftuga/nics\n")
 		os.Exit(1)
 	}
 
