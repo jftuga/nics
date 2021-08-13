@@ -1,5 +1,5 @@
 # nics
-Display information about Network Interface Cards (NICs). This is easier to read compared to `ipconfig`, `ip`, or `ifconfig`.
+Display information about Network Interface Cards (NICs). This program's output is easier to read compared to `ipconfig`, `ip`, or `ifconfig`.
 
 Binaries for Windows, MacOS, Linux and FreeBSD can be found on the [Releases Page](https://github.com/jftuga/nics/releases) -- expand the `Assets` to see the downloads.
 
