@@ -8,6 +8,7 @@ build:
     - darwin
     - linux
     - windows
+    - freebsd
   goarch:
     - amd64
     - arm
@@ -17,6 +18,12 @@ build:
       - 6
       - 7
   ignore:
+    - goos: freebsd
+      goarch: arm
+    - goos: freebsd
+      goarch: arm64
+    - goos: freebsd
+      goarch: mips
     - goos: windows
       goarch: arm
       goarm: 7
