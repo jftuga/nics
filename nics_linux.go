@@ -138,13 +138,16 @@ func getGWFromRouteTable() string {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 
-		// jump to line containing the agteway address
+		// jump to line containing the gateway address
 		for i := 0; i < line; i++ {
 			scanner.Scan()
 		}
 
 		// get field containing gateway address
 		tokens := strings.Split(scanner.Text(), sep)
+		if len(tokens) < field {
+			continue // no gateway found on this line
+		}
 		gatewayHex := "0x" + tokens[field]
 
 		// cast hex address to uint32
