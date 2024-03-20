@@ -13,7 +13,7 @@ usage: nics [options]
 
 ## Installation
 
-* macOS: `brew update; brew install jftuga/tap/nics`
+* macOS: `brew tap jftuga/homebrew-tap; brew update; brew install jftuga/tap/nics`
 * Binaries for Linux, macOS and Windows are provided in the [releases](https://github.com/jftuga/nics/releases) section.
 
 ## Examples
