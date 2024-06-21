@@ -28,7 +28,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-const version = "1.4.6"
+const version = "1.5.0"
 
 func isBriefEntry(ifaceName, macAddr, mtu, flags string, ipv4List, ipv6List []string, debug bool) bool {
 	if debug {
@@ -81,17 +81,23 @@ func extractIPAddrs(ifaceName string, allAddresses []net.Addr, brief bool) ([]st
 	return allIPv4, allIPv6
 }
 
-func networkInterfaces(brief bool, debug bool) ([]string, []string) {
+func networkInterfaces(brief bool, debug bool, singleInterface string) ([]string, []string) {
 	adapters, err := net.Interfaces()
 	if err != nil {
 		fmt.Print(fmt.Errorf("%+v\n", err.Error()))
 		return nil, nil
 	}
 
+	foundSingleInterface := false
+	if len(singleInterface) > 0 {
+		brief = false
+		singleInterface = strings.ToLower(singleInterface)
+	}
+
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetAutoWrapText(false)
 	if brief {
-		table.SetHeader([]string{"Name", "IPv4", "Mac Address", "MTU", "Flags"})
+		table.SetHeader([]string{"Name", "IP", "Mac Address", "MTU", "Flags"})
 	} else {
 		table.SetHeader([]string{"Name", "IPv4", "IPv6", "Mac Address", "MTU", "Flags"})
 	}
@@ -113,16 +119,21 @@ func networkInterfaces(brief bool, debug bool) ([]string, []string) {
 			fmt.Println(iface.Name, allAddresses)
 			fmt.Println("ipv4:", allIPv4)
 			fmt.Println("ipv6:", allIPv6)
-
 		}
 
 		ifaceName := strings.ToLower(iface.Name)
+		if len(singleInterface) > 0 && ifaceName != singleInterface {
+			continue
+		} else if len(singleInterface) > 0 && ifaceName == singleInterface {
+			foundSingleInterface = true
+		}
 		macAddr := iface.HardwareAddr.String()
 		mtu := strconv.Itoa(iface.MTU)
 		flags := iface.Flags.String()
 
 		if brief && isBriefEntry(ifaceName, macAddr, mtu, flags, allIPv4, allIPv6, debug) {
-			table.Append([]string{iface.Name, strings.Join(allIPv4, "\n"), macAddr, mtu, flags})
+			joined := strings.Join(allIPv4, "\n") // + "\n" + strings.Join(allIPv6, "\n")
+			table.Append([]string{iface.Name, joined, macAddr, mtu, flags})
 			for _, ipWithMask := range allIPv4 {
 				ip := strings.Split(ipWithMask, "/")
 				v4Addresses = append(v4Addresses, ip[0])
@@ -144,7 +155,11 @@ func networkInterfaces(brief bool, debug bool) ([]string, []string) {
 			}
 		}
 	}
-	table.Render()
+	if len(singleInterface) > 0 && !foundSingleInterface {
+		_, _ = fmt.Fprintf(os.Stderr, "\ninterface not found: %v\n", singleInterface)
+	} else {
+		table.Render()
+	}
 
 	return v4Addresses, v6Addresses
 }
@@ -153,6 +168,8 @@ func main() {
 	argsAllDetails := flag.Bool("a", false, "show all details on ALL interfaces, including DHCP")
 	argsDebug := flag.Bool("d", false, "show debug information")
 	argsVersion := flag.Bool("v", false, "show program version")
+	argsSingleInterface := flag.String("i", "", "interface name")
+
 	flag.Usage = func() {
 		pgmName := os.Args[0]
 		if strings.HasPrefix(os.Args[0], "./") {
@@ -170,7 +187,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	allIPv4, allIPv6 := networkInterfaces(!(*argsAllDetails), *argsDebug)
+	allIPv4, allIPv6 := networkInterfaces(!(*argsAllDetails), *argsDebug, *argsSingleInterface)
 	fmt.Println()
 	gatewayAndDNS(allIPv4, allIPv6, !(*argsAllDetails))
 }
