@@ -28,7 +28,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-const version = "1.5.1"
+const version = "1.5.2"
 
 func isBriefEntry(ifaceName, macAddr, mtu, flags string, ipv4List, ipv6List []string, debug bool) bool {
 	if debug {
@@ -165,7 +165,7 @@ func networkInterfaces(brief bool, debug bool, singleInterface string) ([]string
 }
 
 func main() {
-	argsAllDetails := flag.Bool("a", false, "show all details on ALL interfaces, including DHCP")
+	argsAllDetails := flag.Bool("a", false, "show all details on ALL interfaces, includes DHCP info on Windows")
 	argsDebug := flag.Bool("d", false, "show debug information")
 	argsVersion := flag.Bool("v", false, "show program version")
 	argsSingleInterface := flag.String("i", "", "interface name")
