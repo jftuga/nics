@@ -11,7 +11,7 @@
     <projectUrl>https://github.com/jftuga/nics</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description><![CDATA[
-nics: Display information about Network Inferface Cards (NICs)
+nics: Display information about Network Interface Cards (NICs)
 
 Example Output:
 +----------+----------------+-------------------+------+------------------------+
@@ -26,7 +26,7 @@ Example Output:
 | 172.22.7.1 | 172.16.7.2 | 172.16.7.3 |
 +------------+------------+------------+
 ]]></description>
-    <summary>Display information about Network Inferface Cards (NICs)</summary>
+    <summary>Display information about Network Interface Cards (NICs)</summary>
     <tags></tags>
     <releaseNotes>https://github.com/jftuga/nics/releases/tag/v1.4.2</releaseNotes>
     <docsUrl>https://github.com/jftuga/nics/blob/master/README.md</docsUrl>

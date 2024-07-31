@@ -3,7 +3,7 @@ nics.go
 -John Taylor
 2019-08-03
 
-Display information about Network Inferface Cards (NICs)
+Display information about Network Interface Cards (NICs)
 
 To compile:
 go build -ldflags="-s -w" nics.go
@@ -28,7 +28,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-const version = "1.5.0"
+const version = "1.5.1"
 
 func isBriefEntry(ifaceName, macAddr, mtu, flags string, ipv4List, ipv6List []string, debug bool) bool {
 	if debug {
@@ -175,7 +175,7 @@ func main() {
 		if strings.HasPrefix(os.Args[0], "./") {
 			pgmName = os.Args[0][2:]
 		}
-		fmt.Fprintf(os.Stderr, "\n%s: Display information about Network Inferface Cards (NICs)\n", pgmName)
+		fmt.Fprintf(os.Stderr, "\n%s: Display information about Network Interface Cards (NICs)\n", pgmName)
 		fmt.Fprintf(os.Stderr, "usage: %s [options]\n", pgmName)
 		flag.PrintDefaults()
 	}

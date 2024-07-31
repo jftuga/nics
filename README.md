@@ -6,8 +6,10 @@ Display information about Network Interface Cards (NICs). This program's output 
 ```
 nics: Display information about Network Interface Cards (NICs)
 usage: nics [options]
-  -a	show all details on ALL interfaces
+  -a	show all details on ALL interfaces, including DHCP
   -d	show debug information
+  -i string
+    	interface name
   -v	show program version
 ```
 
