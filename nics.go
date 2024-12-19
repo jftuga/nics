@@ -28,7 +28,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-const version = "1.5.2"
+const version = "1.5.3"
 
 func isBriefEntry(ifaceName, macAddr, mtu, flags string, ipv4List, ipv6List []string, debug bool) bool {
 	if debug {
