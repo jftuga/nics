@@ -28,7 +28,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-const version = "1.5.3"
+const version = "1.5.4"
 
 func isBriefEntry(ifaceName, macAddr, mtu, flags string, ipv4List, ipv6List []string, debug bool) bool {
 	if debug {
@@ -184,7 +184,7 @@ func main() {
 	if *argsVersion {
 		fmt.Fprintf(os.Stderr, "version %s\n", version)
 		fmt.Fprintf(os.Stderr, "https://github.com/jftuga/nics\n")
-		os.Exit(1)
+		os.Exit(0)
 	}
 
 	allIPv4, allIPv6 := networkInterfaces(!(*argsAllDetails), *argsDebug, *argsSingleInterface)
