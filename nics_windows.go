@@ -155,7 +155,6 @@ func getGatewaysAndDHCP(brief bool) (map[string]string, error) {
 
 	if !brief && len(ipMapDHCP) > 0 {
 		renderDHCPTable(ipMapDHCP)
-		fmt.Println()
 	}
 
 	return ipMapGateway, nil
@@ -171,7 +170,7 @@ func renderDHCPTable(ipMapDHCP map[string][]string) {
 	table.Render()
 }
 
-func gatewayAndDNS(allIPv4, allIPv6 []string, brief bool) {
+func gatewayAndDNS(allIPv4, allIPv6, allRenderedInterfaces []string, brief bool) {
 	var err error
 	var dns = []string{"N/A", "N/A"}
 	dns, err = getDNSEntries()
@@ -180,6 +179,9 @@ func gatewayAndDNS(allIPv4, allIPv6 []string, brief bool) {
 	}
 
 	ipMapGateway := make(map[string]string)
+
+	// always show DHCP server info
+	brief = false
 	ipMapGateway, err = getGatewaysAndDHCP(brief)
 	if err != nil {
 		fmt.Println(err)

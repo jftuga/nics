@@ -28,7 +28,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-const version = "1.5.4"
+const version = "1.6.0"
 
 func isBriefEntry(ifaceName, macAddr, mtu, flags string, ipv4List, ipv6List []string, debug bool) bool {
 	if debug {
@@ -81,11 +81,11 @@ func extractIPAddrs(ifaceName string, allAddresses []net.Addr, brief bool) ([]st
 	return allIPv4, allIPv6
 }
 
-func networkInterfaces(brief bool, debug bool, singleInterface string) ([]string, []string) {
+func networkInterfaces(brief bool, debug bool, singleInterface string) ([]string, []string, []string) {
 	adapters, err := net.Interfaces()
 	if err != nil {
 		fmt.Print(fmt.Errorf("%+v\n", err.Error()))
-		return nil, nil
+		return nil, nil, nil
 	}
 
 	foundSingleInterface := false
@@ -104,12 +104,13 @@ func networkInterfaces(brief bool, debug bool, singleInterface string) ([]string
 
 	var v4Addresses []string
 	var v6Addresses []string
+	var allRenderedInterfaces []string
 	for _, iface := range adapters {
 		//fmt.Printf("%T %v\n", iface, iface)
 		allAddresses, err := iface.Addrs()
 		if err != nil {
 			fmt.Print(fmt.Errorf("%+v\n", err.Error()))
-			return nil, nil
+			return nil, nil, nil
 		}
 
 		allIPv4, allIPv6 := extractIPAddrs(iface.Name, allAddresses, brief)
@@ -134,6 +135,7 @@ func networkInterfaces(brief bool, debug bool, singleInterface string) ([]string
 		if brief && isBriefEntry(ifaceName, macAddr, mtu, flags, allIPv4, allIPv6, debug) {
 			joined := strings.Join(allIPv4, "\n") // + "\n" + strings.Join(allIPv6, "\n")
 			table.Append([]string{iface.Name, joined, macAddr, mtu, flags})
+			allRenderedInterfaces = append(allRenderedInterfaces, iface.Name)
 			for _, ipWithMask := range allIPv4 {
 				ip := strings.Split(ipWithMask, "/")
 				v4Addresses = append(v4Addresses, ip[0])
@@ -145,6 +147,7 @@ func networkInterfaces(brief bool, debug bool, singleInterface string) ([]string
 			table.SetAutoWrapText(true)
 			table.SetRowLine(true)
 			table.Append([]string{ifaceName, strings.Join(allIPv4, "\n"), strings.Join(allIPv6, "\n"), macAddr, mtu, strings.Replace(flags, "|", "\n", -1)})
+			allRenderedInterfaces = append(allRenderedInterfaces, iface.Name)
 			for _, ipWithMask := range allIPv4 {
 				ip := strings.Split(ipWithMask, "/")
 				v4Addresses = append(v4Addresses, ip[0])
@@ -161,7 +164,7 @@ func networkInterfaces(brief bool, debug bool, singleInterface string) ([]string
 		table.Render()
 	}
 
-	return v4Addresses, v6Addresses
+	return v4Addresses, v6Addresses, allRenderedInterfaces
 }
 
 func main() {
@@ -187,7 +190,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	allIPv4, allIPv6 := networkInterfaces(!(*argsAllDetails), *argsDebug, *argsSingleInterface)
-	fmt.Println()
-	gatewayAndDNS(allIPv4, allIPv6, !(*argsAllDetails))
+	allIPv4, allIPv6, allRenderedInterfaces := networkInterfaces(!(*argsAllDetails), *argsDebug, *argsSingleInterface)
+	gatewayAndDNS(allIPv4, allIPv6, allRenderedInterfaces, !(*argsAllDetails))
 }

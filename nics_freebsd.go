@@ -21,6 +21,6 @@ func getGatewaysAndDHCP(brief bool) (map[string]string, error) {
 	return nil, nil
 }
 
-func gatewayAndDNS(allIPv4, allIPv6 []string, brief bool) {
+func gatewayAndDNS(allIPv4, allIPv6, allRenderedInterfaces []string, brief bool) {
 	return
 }
