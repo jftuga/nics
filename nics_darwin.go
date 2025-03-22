@@ -18,16 +18,85 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 package main
 
 import (
+	"fmt"
 	"github.com/olekukonko/tablewriter"
 	"golang.org/x/net/route"
 	"os"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
-func getGatewaysAndDHCP(brief bool) (map[string]string, error) {
-	return nil, nil
+// ParseDHCPInfo parses the input string and extracts DHCP information.
+// It returns a map containing LeaseStartTime, LeaseExpirationTime, server_identifier,
+// and lease_time (converted to decimal).
+func ParseDHCPInfo(input string) (map[string]string, error) {
+	result := make(map[string]string)
+
+	// Extract LeaseStartTime
+	leaseStartPattern := regexp.MustCompile(`LeaseStartTime : ([^\n]+)`)
+	leaseStartMatch := leaseStartPattern.FindStringSubmatch(input)
+	if len(leaseStartMatch) > 1 {
+		result["LeaseStartTime"] = strings.TrimSpace(leaseStartMatch[1])
+	}
+
+	// Extract LeaseExpirationTime
+	leaseExpPattern := regexp.MustCompile(`LeaseExpirationTime : ([^\n]+)`)
+	leaseExpMatch := leaseExpPattern.FindStringSubmatch(input)
+	if len(leaseExpMatch) > 1 {
+		result["LeaseExpirationTime"] = strings.TrimSpace(leaseExpMatch[1])
+	}
+
+	// Extract server_identifier
+	serverIdPattern := regexp.MustCompile(`server_identifier \(ip\): ([^\n]+)`)
+	serverIdMatch := serverIdPattern.FindStringSubmatch(input)
+	if len(serverIdMatch) > 1 {
+		result["server_identifier"] = strings.TrimSpace(serverIdMatch[1])
+	}
+
+	// Extract lease_time and convert to decimal
+	leaseTimePattern := regexp.MustCompile(`lease_time \(uint32\): (0x[0-9a-fA-F]+)`)
+	leaseTimeMatch := leaseTimePattern.FindStringSubmatch(input)
+	if len(leaseTimeMatch) > 1 {
+		hexValue := strings.TrimSpace(leaseTimeMatch[1])
+		// Convert hex to decimal
+		hexValue = strings.TrimPrefix(hexValue, "0x")
+		decimalValue, err := strconv.ParseInt(hexValue, 16, 64)
+		if err != nil {
+			return result, fmt.Errorf("failed to convert lease_time to decimal: %v", err)
+		}
+		result["lease_time"] = fmt.Sprintf("%d", decimalValue)
+		formattedTime, err := FormatLeaseTime(result["lease_time"])
+		if err != nil {
+			return result, fmt.Errorf("failed to format lease_time: %v", err)
+		}
+		result["formatted_lease_time"] = formattedTime
+	}
+	return result, nil
+}
+
+// FormatLeaseTime converts lease time in seconds to a human-readable format
+// showing days, hours, minutes, and seconds.
+func FormatLeaseTime(secondsStr string) (string, error) {
+	// Convert string to integer
+	seconds, err := strconv.ParseInt(secondsStr, 10, 64)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse lease time: %v", err)
+	}
+
+	// Calculate days, hours, minutes, seconds
+	days := seconds / (24 * 60 * 60)
+	seconds %= 24 * 60 * 60
+
+	hours := seconds / (60 * 60)
+	seconds %= 60 * 60
+
+	minutes := seconds / 60
+	seconds %= 60
+
+	// Format the result
+	return fmt.Sprintf("%d days, %d hrs, %d mins, %d secs", days, hours, minutes, seconds), nil
 }
 
 // adopted from: https://stackoverflow.com/a/31221013/452281
@@ -40,7 +109,7 @@ func convert(b []byte) string {
 }
 
 // extract the nameservers from this cmd-line output: scutil --dns
-func parseOutput(output string) []string {
+func parseScutilOutput(output string) []string {
 	var dns = []string{"N/A", "N/A"}
 	allLines := strings.Split(output, "\n")
 	i := 0
@@ -76,8 +145,36 @@ func getMacOSDNS() []string {
 	if err != nil {
 		return dns
 	}
-	dns = parseOutput(string(output))
+	dns = parseScutilOutput(string(output))
 	return dns
+}
+
+func getMacOSDhcp(allAdapters []string) {
+	var allDhcpInfo []map[string]string
+	for _, adapter := range allAdapters {
+		dhcpCmd := exec.Command("/usr/sbin/ipconfig", "getsummary", adapter)
+		output, err := dhcpCmd.CombinedOutput()
+		if err != nil {
+			continue
+		}
+		dhcpInfo, err := ParseDHCPInfo(string(output))
+		if err != nil {
+			continue
+		}
+		dhcpInfo["adapter"] = adapter
+		allDhcpInfo = append(allDhcpInfo, dhcpInfo)
+	}
+	renderDHCPTable(allDhcpInfo)
+}
+
+func renderDHCPTable(allDhcpInfo []map[string]string) {
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetAutoWrapText(false)
+	table.SetHeader([]string{"Name", "DHCP Server", "Lease Start", "Lease Expiration", "Lease Duration"})
+	for _, adapter := range allDhcpInfo {
+		table.Append([]string{adapter["adapter"], adapter["server_identifier"], adapter["LeaseStartTime"], adapter["LeaseExpirationTime"], adapter["formatted_lease_time"]})
+	}
+	table.Render()
 }
 
 // adopted from: https://gist.github.com/abimaelmartell/dcbbff464dc0778165b2dcc5092f90e6
@@ -116,7 +213,8 @@ func getMacOSDefaultGateway() string {
 	return "N/A"
 }
 
-func gatewayAndDNS(allIPv4, allIPv6 []string, brief bool) {
+func gatewayAndDNS(allIPv4, allIPv6, allRenderedInterfaces []string, brief bool) {
+	getMacOSDhcp(allRenderedInterfaces)
 
 	gateway := getMacOSDefaultGateway()
 	dns := getMacOSDNS()

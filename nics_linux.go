@@ -166,7 +166,7 @@ func getGWFromRouteTable() string {
 	return gateway
 }
 
-func gatewayAndDNS(allIPv4, allIPv6 []string, brief bool) {
+func gatewayAndDNS(allIPv4, allIPv6, allRenderedInterfaces []string, brief bool) {
 	conf, err := Config()
 	if err != nil {
 		fmt.Println(err)
