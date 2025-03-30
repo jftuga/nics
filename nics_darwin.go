@@ -172,7 +172,8 @@ func renderDHCPTable(allDhcpInfo []map[string]string) {
 	table.SetAutoWrapText(false)
 	table.SetHeader([]string{"Name", "DHCP Server", "Lease Start", "Lease Expiration", "Lease Duration"})
 	for _, adapter := range allDhcpInfo {
-		table.Append([]string{adapter["adapter"], adapter["server_identifier"], adapter["LeaseStartTime"], adapter["LeaseExpirationTime"], adapter["formatted_lease_time"]})
+		shortLeaseDur := ShortenLeaseDuration(adapter["formatted_lease_time"])
+		table.Append([]string{adapter["adapter"], adapter["server_identifier"], adapter["LeaseStartTime"], adapter["LeaseExpirationTime"], shortLeaseDur})
 	}
 	table.Render()
 }
