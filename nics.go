@@ -28,7 +28,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-const version = "1.6.0"
+const version = "1.6.1"
 
 func isBriefEntry(ifaceName, macAddr, mtu, flags string, ipv4List, ipv6List []string, debug bool) bool {
 	if debug {
@@ -165,6 +165,63 @@ func networkInterfaces(brief bool, debug bool, singleInterface string) ([]string
 	}
 
 	return v4Addresses, v6Addresses, allRenderedInterfaces
+}
+
+// FormatWithCorrectPlurals ensures time units use singular form when the value is 1.
+// For example:
+// - "1 days" becomes "1 day"
+// - "2 mins" remains "2 mins"
+// - "0 hrs, 1 mins" becomes "0 hrs, 1 min"
+//
+// The function handles days, hrs, mins, and secs units.
+func FormatWithCorrectPlurals(duration string) string {
+	// Replace "1 days" with "1 day"
+	duration = strings.Replace(duration, "1 days", "1 day", 1)
+
+	// Replace "1 hrs" with "1 hr"
+	duration = strings.Replace(duration, "1 hrs", "1 hr", 1)
+
+	// Replace "1 mins" with "1 min"
+	duration = strings.Replace(duration, "1 mins", "1 min", 1)
+
+	// Replace "1 secs" with "1 sec"
+	duration = strings.Replace(duration, "1 secs", "1 sec", 1)
+
+	return duration
+}
+
+// ShortenLeaseDuration trims trailing zero units from a lease duration string.
+//
+// For example:
+// - "1 days, 0 hrs, 0 mins, 0 secs" becomes "1 day"
+// - "1 days, 0 hrs, 5 mins, 0 secs" becomes "1 day, 0 hrs, 5 mins"
+// - "1 days, 0 hrs, 0 mins, 1 secs" becomes "1 day, 0 hrs, 0 mins, 1 sec"
+//
+// The function preserves any non-zero units and removes only trailing zero units.
+// It also ensures correct singular/plural forms.
+func ShortenLeaseDuration(leaseDuration string) string {
+	// Split the duration into its components
+	components := strings.Split(leaseDuration, ", ")
+
+	// Find the last non-zero component
+	lastNonZeroIndex := len(components) - 1
+	for i := len(components) - 1; i > 0; i-- {
+		if !strings.HasPrefix(components[i], "0 ") {
+			break
+		}
+		lastNonZeroIndex = i - 1
+	}
+
+	// If all components after the first one are zero, return just the first component
+	if lastNonZeroIndex == 0 {
+		return FormatWithCorrectPlurals(components[0])
+	}
+
+	// Join the components up to and including the last non-zero one
+	shortened := strings.Join(components[:lastNonZeroIndex+1], ", ")
+
+	// Apply pluralization formatting
+	return FormatWithCorrectPlurals(shortened)
 }
 
 func main() {
