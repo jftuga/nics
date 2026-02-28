@@ -165,7 +165,7 @@ func renderDHCPTable(ipMapDHCP map[string][]string) {
 	table.SetAutoWrapText(false)
 	table.SetHeader([]string{"IP", "DHCP Server", "Lease Renewed", "Lease Expires"})
 	for ip, dhcpInfo := range ipMapDHCP {
-		table.Append([]string{ip, dhcpInfo[0], dhcpInfo[1], dhcpInfo[2]})
+		table.Append([]string{ColorizeIP(ip), ColorizeIP(dhcpInfo[0]), dhcpInfo[1], dhcpInfo[2]})
 	}
 	table.Render()
 }
@@ -192,10 +192,10 @@ func gatewayAndDNS(allIPv4, allIPv6, allRenderedInterfaces []string, brief bool)
 	table.SetHeader([]string{"Gateway", "DNS 1", "DNS 2"})
 	for ip := range ipMapGateway {
 		if arrayContains(ip, allIPv4) {
-			table.Append([]string{ipMapGateway[ip], dns[0], dns[1]})
+			table.Append([]string{ColorizeIP(ipMapGateway[ip]), ColorizeIP(dns[0]), ColorizeIP(dns[1])})
 		}
 		if arrayContains(ip, allIPv6) {
-			table.Append([]string{ipMapGateway[ip], dns[0], dns[1]})
+			table.Append([]string{ColorizeIP(ipMapGateway[ip]), ColorizeIP(dns[0]), ColorizeIP(dns[1])})
 		}
 		dns[0] = ""
 		dns[1] = ""

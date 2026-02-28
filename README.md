@@ -9,8 +9,8 @@ nics: Display information about Network Interface Cards (NICs)
 usage: nics [options]
   -a	show all details on ALL interfaces, includes DHCP info on Windows
   -d	show debug information
-  -i string
-    	interface name
+  -i string interface name
+  -nc no color output
   -v	show program version
 ```
 
