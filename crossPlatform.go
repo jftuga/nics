@@ -42,3 +42,36 @@ func arrayContains(value string, array []string) bool {
 	}
 	return false
 }
+
+var noColor bool
+
+const (
+	ansiCyan  = "\033[36m"
+	ansiReset = "\033[0m"
+)
+
+// ColorizeIP wraps an IP address string in ANSI cyan color codes.
+func ColorizeIP(ip string) string {
+	if noColor || ip == "" || ip == "N/A" {
+		return ip
+	}
+	return ansiCyan + ip + ansiReset
+}
+
+// ColorizeCIDR colorizes just the IP portion of a CIDR notation address (e.g., 172.22.2.74/24).
+func ColorizeCIDR(cidr string) string {
+	parts := strings.SplitN(cidr, "/", 2)
+	if len(parts) == 2 {
+		return ColorizeIP(parts[0]) + "/" + parts[1]
+	}
+	return ColorizeIP(cidr)
+}
+
+// ColorizeIPList applies ColorizeCIDR to each element in a slice.
+func ColorizeIPList(ips []string) []string {
+	result := make([]string, len(ips))
+	for i, ip := range ips {
+		result[i] = ColorizeCIDR(ip)
+	}
+	return result
+}
